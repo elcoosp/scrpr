@@ -1,6 +1,7 @@
 use derive_more::derive::Display;
 use futures::future::join_all;
 use rayon::prelude::*;
+use serde::*;
 use thiserror::Error;
 pub trait RemoteScrapable: Send + Sync {
     type Output;
@@ -14,10 +15,11 @@ pub trait RemoteScrapable: Send + Sync {
     /// Resource selector
     fn res_selector(&self) -> &'static str;
 }
-#[derive(Error, Debug, Display)]
+#[derive(Error, Debug, Display, Clone, Serialize, Deserialize)]
 pub enum RemoteScrapeError {
-    Request(#[from] reqwest::Error),
-    UrlParse(#[from] url::ParseError),
+    // Reqwest errror not clonable
+    Request(String),
+    UrlParse(String),
     NoElementMatch,
     PageNotFound(String),
 }
@@ -30,12 +32,20 @@ pub async fn remote_scrape<T: RemoteScrapable>(
         ids.par_iter()
             .map(|id| async {
                 let id_url = remote_scrappable.id_url(id);
-                let response = client.get(id_url.clone()).send().await?;
+                let response = client
+                    .get(id_url.clone())
+                    .send()
+                    .await
+                    .map_err(|e| RemoteScrapeError::Request(format!("{e}")))?;
                 if response.status() == 404 {
                     // https://crates.io/crates/analiticcl & https://docs.rs/zspell/latest/zspell/
                     return Err(RemoteScrapeError::PageNotFound(id_url));
                 }
-                let response_html_text = response.text().await?;
+                let response_html_text = response
+                    .text()
+                    .await
+                    .map_err(|e| RemoteScrapeError::Request(format!("{e}")))?;
+
                 let selector = scraper::Selector::parse(&remote_scrappable.res_selector()).unwrap();
                 let document = scraper::Html::parse_document(&response_html_text);
                 let elems = document.select(&selector).collect::<Vec<_>>();

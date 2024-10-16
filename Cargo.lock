@@ -1182,6 +1182,7 @@ dependencies = [
  "rayon",
  "reqwest",
  "scraper",
+ "serde",
  "thiserror",
  "url",
 ]
