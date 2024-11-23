@@ -10,11 +10,11 @@ export default {
   domain: "gmail",
   email: author,
   repobeats: "60664cec3ecf2933bc6c9067f78822346f013fba",
-  images: { screenshot: "images/screenshot.gif", logo: "images/logo.png" },
+  images: { logo: "images/logo.png" },
   sections: {
     projectDescription: "Basic rust scraper and data selector",
     about: "Scrape and select",
-    installation: "sh```cargo install scrpr```",
+    installation: "```cargo install scrpr```",
     acknowledgments: "",
     gettingStarted: "",
     roadmap: "",
