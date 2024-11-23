@@ -50,7 +50,7 @@
 
 ## 💡 About the project
 
-<img src="images/screenshot.gif" alt="Product screenshot" />
+<img src="undefined" alt="Product screenshot" />
   
 Scrape and select
 
@@ -58,7 +58,7 @@ Scrape and select
 
 ## 📋 Installation
 
-sh```cargo install scrpr```
+```cargo install scrpr```
 
 ## 🔧 Usage
 
