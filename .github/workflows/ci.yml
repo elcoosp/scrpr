@@ -12,20 +12,17 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      CARGO_INCREMENTAL: "0"
+      RUSTFLAGS: "-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort"
+      RUSTDOCFLAGS: "-Cpanic=abort"
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          override: true
       - name: build
-        run: cargo build --verbose
+        run: cargo build
       - name: test
-        run: cargo test --verbose
-        env:
-          CARGO_INCREMENTAL: "0"
-          RUSTFLAGS: "-Cllvm-args=--codegen-units=1 -Cllvm-args=--inline-threshold=0 -Cllvm-args=--link-dead-Cllvm-args=--ode -Cllvm-args=--overflow-Cllvm-args=--hecks=off -Cllvm-args=--panic=abort -Zpanic_abort_tests"
-          RUSTDOCFLAGS: "-Cllvm-args=--codegen-units=1 -Cllvm-args=--inline-threshold=0 -Cllvm-args=--link-dead-Cllvm-args=--ode -Cllvm-args=--overflow-Cllvm-args=--hecks=off -Cllvm-args=--panic=abort -Zpanic_abort_tests"
+        run: cargo test
       - name: rust-grcov
         uses: actions-rs/grcov@v0.1
       - name: codecov
