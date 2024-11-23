@@ -1,0 +1,7 @@
+{
+    "commitMessageTopic": "rust crate {{depName}}",
+    "fileMatch": [
+      "(^|/)Cargo\\.toml$"
+    ],
+    "versioning": "cargo"
+  }
