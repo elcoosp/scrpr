@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+## [0.1.1](https://github.com/elcoosp/scrpr/compare/v0.1.0...v0.1.1)
+
+### ⚙️ Miscellaneous Tasks
+
+- Codecov-action v5 - ([cb9e31f](https://github.com/elcoosp/scrpr/commit/cb9e31f987546f46d19beff68d7d3cecdb9e0594))
+
+# Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
