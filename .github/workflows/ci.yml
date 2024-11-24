@@ -12,10 +12,6 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      CARGO_INCREMENTAL: "0"
-      RUSTFLAGS: "-Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off -Zpanic_abort_tests -Cpanic=abort"
-      RUSTDOCFLAGS: "-Cpanic=abort"
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
@@ -26,14 +22,6 @@ jobs:
         run: cargo build
       - name: test
         run: cargo test
-      - name: rust-grcov
-        uses: actions-rs/grcov@v0.1
-      - name: codecov
-        # You may pin to the exact commit or the version.
-        # uses: codecov/codecov-action@81cd2dc8148241f03f5839d295e000b8f761e378
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
       - name: release-plz
         uses: release-plz/action@v0.5.85
         env:
