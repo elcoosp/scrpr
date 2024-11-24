@@ -1,7 +1,6 @@
 {
-    "commitMessageTopic": "rust crate {{depName}}",
-    "fileMatch": [
-      "(^|/)Cargo\\.toml$"
-    ],
-    "versioning": "cargo"
-  }
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ]
+}
