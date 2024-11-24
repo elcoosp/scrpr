@@ -13,10 +13,10 @@ keywords = ["scraper"]
 [dependencies]
 reqwest = "0.12.8"
 rayon = "1.10.0"
-thiserror = "1.0.64"
+thiserror = "2.0.3"
 derive_more = { version = "1.0.0", features = ["full"] }
 futures = "0.3.31"
-scraper = "0.20.0"
+scraper = "0.21.0"
 url = { version = "2.5.2" }
 serde = { version = "1.0.210", features = ["derive"] }
 tokio = { version = "1.41.1", features = ["macros"] }

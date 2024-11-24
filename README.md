@@ -91,6 +91,8 @@ Project Link: [https://github.com/elcoosp/scrpr](https://github.com/elcoosp/scrp
 
 ## 👏 Acknowledgments
 
+[Scraper crate](https://docs.rs/scraper/0.21.0/scraper/)
+
 <!--MARKDOWN LINKS & IMAGES-- >
 <!--https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 ![Alt](https://repobeats.axiom.co/api/embed/60664cec3ecf2933bc6c9067f78822346f013fba.svg "Repobeats analytics image")

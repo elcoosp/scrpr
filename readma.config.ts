@@ -15,7 +15,7 @@ export default {
     projectDescription: "Basic rust scraper and data selector",
     about: "Scrape and select",
     installation: "```cargo install scrpr```",
-    acknowledgments: "",
+    acknowledgments: "[Scraper crate](https://docs.rs/scraper/0.21.0/scraper/)",
     gettingStarted: "",
     roadmap: "",
     usage: ""
