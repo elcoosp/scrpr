@@ -7,7 +7,6 @@
 [![Stargazers][stargazers-shield]][stargazers-url]
 [![Commit activity][commit-activity-shield]][commit-activity-url]
 [![Branch action runs][branch-action-runs-shield]][branch-action-runs-url]
-[![Issues][issues-shield]][issues-url]
 [![License][license-shield]][license-url]
 
 <!-- PROJECT LOGO -->
@@ -50,8 +49,6 @@
 
 ## 💡 About the project
 
-<img src="undefined" alt="Product screenshot" />
-  
 Scrape and select
 
 ## 🎉 Getting started
@@ -100,7 +97,7 @@ Project Link: [https://github.com/elcoosp/scrpr](https://github.com/elcoosp/scrp
 [crates-msrv-shield]: https://img.shields.io/crates/msrv/scrpr.svg?style=for-the-badge
 [crates-msrv-url]: https://crates.io/crates/scrpr
 [codecov-shield]: https://img.shields.io/codecov/c/github/elcoosp/scrpr/main.svg?style=for-the-badge
-[codecov-url]: https://codecov.io/github/elcoosp/scrpr
+[codecov-url]: https://codecov.io/github/elcoosp/scrpr/tree/main
 [contributors-shield]: https://img.shields.io/github/contributors/elcoosp/scrpr.svg?style=for-the-badge
 [contributors-url]: https://github.com/elcoosp/scrpr/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/elcoosp/scrpr.svg?style=for-the-badge
@@ -111,7 +108,5 @@ Project Link: [https://github.com/elcoosp/scrpr](https://github.com/elcoosp/scrp
 [commit-activity-url]: https://github.com/elcoosp/scrpr/commits
 [branch-action-runs-shield]: https://img.shields.io/github/check-runs/elcoosp/scrpr/main.svg?style=for-the-badge
 [branch-action-runs-url]: https://github.com/elcoosp/scrpr/actions?query=branch%3Amain
-[issues-shield]: https://img.shields.io/github/license/elcoosp/scrpr.svg?style=for-the-badge
-[issues-url]: https://github.com/elcoosp/scrpr/issues
 [license-shield]: https://img.shields.io/github/license/elcoosp/scrpr.svg?style=for-the-badge
 [license-url]: https://github.com/elcoosp/scrpr/blob/master/LICENSE.txt
