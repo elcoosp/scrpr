@@ -2,7 +2,14 @@
 name = "scrpr"
 version = "0.1.0"
 edition = "2021"
-
+license = "MIT"
+description = "Basic rust scraper and data selector"
+authors = ["elcoosp"]
+rust-version = "1.81"
+documentation = "https://github.com/elcoosp/scrpr"
+homepage = "https://github.com/elcoosp/scrpr"
+repository = "https://github.com/elcoosp/scrpr"
+keywords = ["scraper"]
 [dependencies]
 reqwest = "0.12.8"
 rayon = "1.10.0"
