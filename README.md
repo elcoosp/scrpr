@@ -98,7 +98,7 @@ Project Link: [https://github.com/elcoosp/scrpr](https://github.com/elcoosp/scrp
 [crates-msrv-shield]: https://img.shields.io/crates/msrv/scrpr.svg?style=for-the-badge
 [crates-msrv-url]: https://crates.io/crates/scrpr
 [crates-io-version-shield]: https://img.shields.io/crates/v/scrpr.svg?style=for-the-badge
-[crates-io-version-url]: https://crates.io//scrpr
+[crates-io-version-url]: https://crates.io/crates/scrpr
 [codecov-shield]: https://img.shields.io/codecov/c/github/elcoosp/scrpr/main.svg?style=for-the-badge
 [codecov-url]: https://codecov.io/github/elcoosp/scrpr/tree/main
 [contributors-shield]: https://img.shields.io/github/contributors/elcoosp/scrpr.svg?style=for-the-badge
