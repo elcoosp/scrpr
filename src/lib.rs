@@ -15,7 +15,7 @@ pub trait RemoteScrapable: Send + Sync {
     /// Resource selector
     fn res_selector(&self) -> &'static str;
 }
-#[derive(Error, Debug, Display, Clone, Serialize, Deserialize)]
+#[derive(Error, Debug, Display, Clone, Serialize, Deserialize, PartialEq)]
 pub enum RemoteScrapeError {
     // Reqwest errror not clonable
     Request(String),
@@ -57,4 +57,52 @@ pub async fn remote_scrape<T: RemoteScrapable>(
             .collect::<Vec<_>>(),
     )
     .await
+}
+
+mod test {
+    #[tokio::test]
+    async fn remote_scrape_test() {
+        use crate::*;
+        enum TestRemoteScrapper {
+            Play,
+        }
+        impl RemoteScrapable for TestRemoteScrapper {
+            type Output = url::Url;
+
+            fn id_url(&self, id: &String) -> String {
+                match self {
+                    Self::Play => format!(
+                        "{}?id={}",
+                        "https://play.google.com/store/apps/details",
+                        id.clone()
+                    ),
+                }
+            }
+
+            fn elem_into<'a>(
+                &self,
+                elem: &'a scraper::ElementRef<'a>,
+            ) -> Result<Self::Output, RemoteScrapeError> {
+                match self {
+                    Self::Play => {
+                        let img_srcset_attr = elem.attr("srcset").unwrap();
+                        // We need to remove the postfix
+                        match url::Url::parse(&img_srcset_attr.replace(" 2x", "")) {
+                            Ok(img_url) => Ok(img_url),
+                            Err(e) => Err(RemoteScrapeError::UrlParse(format!("{e}"))),
+                        }
+                    }
+                }
+            }
+
+            fn res_selector(&self) -> &'static str {
+                "body > c-wiz > div > div > div:nth-child(1) > div > div:nth-child(1) > div > div > c-wiz > div > img[alt='Icon image']"
+            }
+        }
+        let trs = TestRemoteScrapper::Play;
+        let result = remote_scrape(&trs, &vec!["org.thoughtcrime.securesms".into()]).await;
+        assert_eq!(result, vec![
+            Ok(url::Url::parse("https://play-lh.googleusercontent.com/FtGKSwVtpmMxKoJrJuI837DkYGRsqlMdiVPAd8bomLQZ3_Hc55XokY_dYdXKgGagiYs=w480-h960").unwrap())
+        ]);
+    }
 }
