@@ -12,9 +12,9 @@ export default {
   repobeats: "60664cec3ecf2933bc6c9067f78822346f013fba",
   images: { logo: "images/logo.png" },
   sections: {
+    features: 'Scrape and select with css selectors in parallel',
     projectDescription: "Basic rust scraper and data selector",
     about: "Scrape and select",
-    installation: "```cargo install scrpr```",
     acknowledgments: "[Scraper crate](https://docs.rs/scraper/0.21.0/scraper/)",
     gettingStarted: "",
     roadmap: "",
