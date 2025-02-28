@@ -14,7 +14,7 @@ keywords = ["scraper"]
 reqwest = "0.12.8"
 rayon = "1.10.0"
 thiserror = "2.0.3"
-derive_more = { version = "1.0.0", features = ["full"] }
+derive_more = { version = "2.0.0", features = ["full"] }
 futures = "0.3.31"
 scraper = "0.22.0"
 url = { version = "2.5.2" }
