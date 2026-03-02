@@ -11,7 +11,7 @@ homepage = "https://github.com/elcoosp/scrpr"
 repository = "https://github.com/elcoosp/scrpr"
 keywords = ["scraper"]
 [dependencies]
-reqwest = "0.12.8"
+reqwest = "0.13.0"
 rayon = "1.10.0"
 thiserror = "2.0.3"
 derive_more = { version = "2.0.0", features = ["full"] }
