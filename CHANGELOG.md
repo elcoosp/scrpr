@@ -6,7 +6,13 @@ All notable changes to this project will be documented in this file.
 
 ### ⛰️ Features
 
-- [**breaking**] Rewrite scraping core with bounded concurrency, retries and offline helpers - ([dfdceab](https://github.com/elcoosp/scrpr/commit/dfdceabf5bad63b51a70bb4fef99c3e5e71fd0c5))
+- *(ci)* Add git-cliff changelog auto-generation workflow - ([32443e4](https://github.com/elcoosp/scrpr/commit/32443e47db7d7f55f435b035415ef07041e60b94))
+- *(ci)* Add comprehensive CI pipeline with fmt, clippy, tests, MSRV and coverage - ([69ad7b7](https://github.com/elcoosp/scrpr/commit/69ad7b7a4b30846bb91f16847425b29e60c2eca9))
+- [**breaking**] Bump to v0.2.0 with edition 2024, MSRV 1.88 and dependency overhaul - ([65f9704](https://github.com/elcoosp/scrpr/commit/65f970444b082a3cdda9ac059a5a0afffc92440b))
+- Add typed RemoteScrapeError enum with serde and thiserror - ([9f74ee9](https://github.com/elcoosp/scrpr/commit/9f74ee9724bd5a02c97dbae8ada3519152ddd732))
+- [**breaking**] Rewrite lib.rs with module structure and offline doctests - ([24927dd](https://github.com/elcoosp/scrpr/commit/24927ddac8db919ef54f0283bb01d6eb6efe3214))
+- Implement RemoteScraper with bounded concurrency, retries and builder - ([f42d59e](https://github.com/elcoosp/scrpr/commit/f42d59e40d530931f292f7fcb50a99b674b93c45))
+- Define RemoteScrapable trait and ElementExt helper trait - ([fead81a](https://github.com/elcoosp/scrpr/commit/fead81ac254439b54ea474eebede76beba6cb2e9))
 
 ### 🐛 Bug Fixes
 
@@ -14,12 +20,23 @@ All notable changes to this project will be documented in this file.
 - Release workflow only on main push - ([a1632c2](https://github.com/elcoosp/scrpr/commit/a1632c26a9ea7a2977f1be938d5f0e9b18a66fc1))
 - Up deps & add acknowledgment - ([9c1b30c](https://github.com/elcoosp/scrpr/commit/9c1b30c29d205bfb11966635f9990e72a688031a))
 
+### 🚜 Refactor
+
+- *(ci)* Replace release-plz with git-cliff release pipeline - ([9a14910](https://github.com/elcoosp/scrpr/commit/9a14910ac7e9964d9c9e296ab1c4851d72fad0fb))
+
 ### 📚 Documentation
 
 - Crate link fix - ([f02e980](https://github.com/elcoosp/scrpr/commit/f02e980298bcb53d92b38cc05b60162563848df3))
 - Up readme - ([adaaf67](https://github.com/elcoosp/scrpr/commit/adaaf672fb4f9e74d84a4c1c6ddc32bd76e6e5b5))
 - Fix double unreleased in changelog - ([72c7078](https://github.com/elcoosp/scrpr/commit/72c707802091d2d01f261a906de6131f8f5f224f))
-- Refresh README with features and usage examples, add brainstorm rationale - ([5cb59c3](https://github.com/elcoosp/scrpr/commit/5cb59c3bbdeaca148d8f5bae9ebec3a86228ec66))
+- Regenerate changelog with git-cliff format - ([9ee4a66](https://github.com/elcoosp/scrpr/commit/9ee4a6659f62bab1cf1f6e76a510c9bd2343c334))
+- Rewrite README with v0.2.0 features, examples and usage guide - ([c0fd411](https://github.com/elcoosp/scrpr/commit/c0fd411b56dcb4acd123cb68e07f5a835b5316c1))
+- Add brainstorm and design rationale for v0.2.0 rewrite - ([f7d3e24](https://github.com/elcoosp/scrpr/commit/f7d3e24c857e6912bbaa9786299c867e0584e447))
+
+### 🧪 Testing
+
+- Add comprehensive offline test suite with 25+ test cases - ([2f3f878](https://github.com/elcoosp/scrpr/commit/2f3f87890a311df3675d4d76686a56c5e10f886b))
+- Add hand-rolled HTTP test server with zero external dependencies - ([8b10338](https://github.com/elcoosp/scrpr/commit/8b10338c90a9dccb1c946349debdc66765c9b850))
 
 ### ⚙️ Miscellaneous Tasks
 
@@ -29,7 +46,7 @@ All notable changes to this project will be documented in this file.
 - Add license - ([ead4d83](https://github.com/elcoosp/scrpr/commit/ead4d83d90de326e6d29c15449f5a556c09ecb49))
 - Up release-plz - ([7f9e759](https://github.com/elcoosp/scrpr/commit/7f9e759d3186832ef78e1195b1f7ebeb6eb97734))
 - Use actions-rust-lang/setup-rust-toolchain - ([26f0c9a](https://github.com/elcoosp/scrpr/commit/26f0c9abc5159e092136191125263bbdd5745417))
-- Replace release-plz with git-cliff changelog and release pipeline - ([488f403](https://github.com/elcoosp/scrpr/commit/488f403ab7be44087adaa38e91f7009c9777a846))
+- Readme - ([61f2c76](https://github.com/elcoosp/scrpr/commit/61f2c7636a6c5c66f26b52cea12624a19418eb38))
 
 
 ## [0.1.0]
