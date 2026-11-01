@@ -1,18 +1,69 @@
 # Changelog
 
-## [Unreleased]
-
-## [0.1.1]
-
-# Changelog
-
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [Unreleased]
 
-## [0.1.0](https://github.com/elcoosp/scrpr/releases/tag/v0.1.0) - 2024-11-24
+### ⛰️ Features
 
-### Fixed
+- [**breaking**] Rewrite scraping core with bounded concurrency, retries and offline helpers - ([dfdceab](https://github.com/elcoosp/scrpr/commit/dfdceabf5bad63b51a70bb4fef99c3e5e71fd0c5))
 
-- missing Cargo.toml package metadata
+### 🐛 Bug Fixes
+
+- Renovate config - ([d3159e8](https://github.com/elcoosp/scrpr/commit/d3159e8e28b20f3c940d832447d620d6f51d624e))
+- Release workflow only on main push - ([a1632c2](https://github.com/elcoosp/scrpr/commit/a1632c26a9ea7a2977f1be938d5f0e9b18a66fc1))
+- Up deps & add acknowledgment - ([9c1b30c](https://github.com/elcoosp/scrpr/commit/9c1b30c29d205bfb11966635f9990e72a688031a))
+
+### 📚 Documentation
+
+- Crate link fix - ([f02e980](https://github.com/elcoosp/scrpr/commit/f02e980298bcb53d92b38cc05b60162563848df3))
+- Up readme - ([adaaf67](https://github.com/elcoosp/scrpr/commit/adaaf672fb4f9e74d84a4c1c6ddc32bd76e6e5b5))
+- Fix double unreleased in changelog - ([72c7078](https://github.com/elcoosp/scrpr/commit/72c707802091d2d01f261a906de6131f8f5f224f))
+- Refresh README with features and usage examples, add brainstorm rationale - ([5cb59c3](https://github.com/elcoosp/scrpr/commit/5cb59c3bbdeaca148d8f5bae9ebec3a86228ec66))
+
+### ⚙️ Miscellaneous Tasks
+
+- Codecov-action v5 - ([cb9e31f](https://github.com/elcoosp/scrpr/commit/cb9e31f987546f46d19beff68d7d3cecdb9e0594))
+- Readme double license badge - ([37e4182](https://github.com/elcoosp/scrpr/commit/37e41823863c67c5d6e104c70dd5746d19f37502))
+- Crates.io version shield in readme - ([74810bd](https://github.com/elcoosp/scrpr/commit/74810bd6689dfb490494120567e27b5d4d84d3b1))
+- Add license - ([ead4d83](https://github.com/elcoosp/scrpr/commit/ead4d83d90de326e6d29c15449f5a556c09ecb49))
+- Up release-plz - ([7f9e759](https://github.com/elcoosp/scrpr/commit/7f9e759d3186832ef78e1195b1f7ebeb6eb97734))
+- Use actions-rust-lang/setup-rust-toolchain - ([26f0c9a](https://github.com/elcoosp/scrpr/commit/26f0c9abc5159e092136191125263bbdd5745417))
+- Replace release-plz with git-cliff changelog and release pipeline - ([488f403](https://github.com/elcoosp/scrpr/commit/488f403ab7be44087adaa38e91f7009c9777a846))
+
+
+## [0.1.0]
+
+### ⛰️ Features
+
+- Impl remote_scrape fn using a RemoteScrapable and a bunch of ids to reqwest and scrape the res_selector then turn in into a Self::Output - ([ac652f5](https://github.com/elcoosp/scrpr/commit/ac652f50c3e0c2ecad70e627b6277c55ccd1c134))
+- Serde De/Serializable RemoteScrapeError - ([6ee767e](https://github.com/elcoosp/scrpr/commit/6ee767e983e3764cdc6b9743fbe0d0723e2c1f9b))
+
+### 🐛 Bug Fixes
+
+- Missing Cargo.toml package metadata - ([87ea791](https://github.com/elcoosp/scrpr/commit/87ea7910f9626bbe1cdcb5e238be5ae6dde2c858))
+
+### 📚 Documentation
+
+- Readme & ci workflow - ([6e8aef9](https://github.com/elcoosp/scrpr/commit/6e8aef95011240ca57d9b7cfb2c4f51be3d95913))
+- Readme gen - ([c4f555e](https://github.com/elcoosp/scrpr/commit/c4f555e1a0da4890cd1bdb97ef3b6fef931334c7))
+
+### 🧪 Testing
+
+- Remote_scrape fn & add PartialEq to crate Err - ([a762922](https://github.com/elcoosp/scrpr/commit/a76292259952d77e2331170109f2839122527629))
+
+### ⚙️ Miscellaneous Tasks
+
+- Workflow release with env - ([232e1da](https://github.com/elcoosp/scrpr/commit/232e1da43bf210711808db99ad8f0a6e71bd726f))
+- Renovate - ([9a40dff](https://github.com/elcoosp/scrpr/commit/9a40dff1db2ec3e5192d21463ed97035f5e59a8f))
+- Codecov - ([d4d8167](https://github.com/elcoosp/scrpr/commit/d4d8167f13a52c9705a38692ad00ebdd9db7f528))
+- Rust nightly test - ([a28f343](https://github.com/elcoosp/scrpr/commit/a28f343bdd18ae90d4cef39bf22221df80071a93))
+- Use Cllvm-args - ([bf5eedc](https://github.com/elcoosp/scrpr/commit/bf5eedca59827a5d4a5b308a01bfad966d13e41c))
+- Rm Zprofile - ([e27f299](https://github.com/elcoosp/scrpr/commit/e27f2992eac477f6971bacfdfb0ad52f8d647972))
+- Use https://github.com/mozilla/grcov?tab=readme-ov-file#example-how-to-generate-gcda-files-for-a-rust-project - ([ce56b00](https://github.com/elcoosp/scrpr/commit/ce56b000cfa1884cf62314665e9933927dd4f840))
+- Readd toolchain - ([56587ea](https://github.com/elcoosp/scrpr/commit/56587ea83c1545c9720bc46e1ca8e2a03a0068d0))
+- Missing with - ([10acbb8](https://github.com/elcoosp/scrpr/commit/10acbb8567723d557e833a967313f1cd9aa61de1))
+- Rm -Zprofile see https://github.com/rust-lang/rust/pull/131829 - ([52b6525](https://github.com/elcoosp/scrpr/commit/52b6525033a876d24d49773d9da70ab40cd710ac))
+- Split coverage action with tarpaulin - ([0fe666f](https://github.com/elcoosp/scrpr/commit/0fe666f665b0429c507f13fbf36e5145f894aaeb))
+
+<!-- generated by git-cliff -->
