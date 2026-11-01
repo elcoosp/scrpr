@@ -1,19 +1,30 @@
-name: release
+name: Release
 
 on:
   push:
-    branches: ["main"]
+    tags: ["v*"]
+
+permissions:
+  contents: write
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  release:
+    name: changelog, GitHub release and crates.io publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+<<<<<<< HEAD
       - uses: actions-rust-lang/setup-rust-toolchain@v2
+||||||| parent of 2ee984b (refactor(ci): replace release-plz with git-cliff release pipeline)
+      - uses: actions/checkout@v6
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+=======
+>>>>>>> 2ee984b (refactor(ci): replace release-plz with git-cliff release pipeline)
         with:
+<<<<<<< HEAD
           toolchain: nightly
           override: true
       - name: build
@@ -22,6 +33,43 @@ jobs:
         run: cargo test
       - name: release-plz
         uses: release-plz/action@v0.5.140
+||||||| parent of 2ee984b (refactor(ci): replace release-plz with git-cliff release pipeline)
+          toolchain: nightly
+          override: true
+      - name: build
+        run: cargo build
+      - name: test
+        run: cargo test
+      - name: release-plz
+        uses: release-plz/action@v0.5.120
+=======
+          # git-cliff needs the full history and every tag.
+          fetch-depth: 0
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v2
+
+      - uses: Swatinem/rust-cache@v2
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: git-cliff
+
+      - name: Run tests
+        run: cargo test --all-features
+
+      - name: Generate release notes for the latest tag
+        run: git-cliff --latest --strip all > release-notes.md
+
+      - name: Refresh CHANGELOG.md
+        run: git-cliff --output CHANGELOG.md
+
+      - name: Publish to crates.io
+        run: cargo publish --locked
+>>>>>>> 2ee984b (refactor(ci): replace release-plz with git-cliff release pipeline)
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: release-notes.md
