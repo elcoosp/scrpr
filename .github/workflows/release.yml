@@ -32,7 +32,7 @@ jobs:
       - name: test
         run: cargo test
       - name: release-plz
-        uses: release-plz/action@v0.5.140
+        uses: release-plz/action@v0.5.148
 ||||||| parent of 2ee984b (refactor(ci): replace release-plz with git-cliff release pipeline)
           toolchain: nightly
           override: true
@@ -41,7 +41,7 @@ jobs:
       - name: test
         run: cargo test
       - name: release-plz
-        uses: release-plz/action@v0.5.120
+        uses: release-plz/action@v0.5.148
 =======
           # git-cliff needs the full history and every tag.
           fetch-depth: 0
