@@ -2,58 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.3.0] - 2026-11-03
-
-### ⛰️ Features (breaking redesign)
-
-- **Typed extraction**: new `Extract` trait (serde-style, one impl per domain
-  type) plus `scrape_html`, `Scraper::fetch_as`, `Scraper::scrape` and
-  `Scraper::scrape_stream` entry points.
-- **Composable field DSL**: `field::{text, text_all, attr, attr_opt, attr_all,
-  attr_url, inner_html, outer_html, links, page_url, title, meta,
-  meta_property, json_ld}` extractors with `map` / `try_map` / `parse::<F>` /
-  `optional` / `or` / `or_default` combinators and tuple extraction
-  (`FieldSet`, up to 12 fields, owned or borrowed).
-- **`Page` handle**: parsed document + source url with `select`,
-  `select_first`, `links`, `title`, `meta`, `meta_property`, `scripts`,
-  `json_ld` (behind the default `json` feature) and `resolve`.
-- **Streaming batch API**: `scrape_stream` yields `(position, result)` pairs
-  in input order with bounded concurrency.
-- **Politeness**: `rate_limit` / `min_request_interval` pacing, capped
-  exponential backoff, `Retry-After` honored on 429 (configurable),
-  identifying default `User-Agent`.
-- **Robustness**: response body size cap with capped streaming reads,
-  charset decoding via `encoding_rs`, connect/read timeouts, redirect
-  policy controls, cookie store, proxy support, default headers.
-- **Optional page cache**: capacity + TTL bounded, deduplicates repeated
-  urls, shared across `Scraper` clones.
-- **Process-wide CSS selector cache** (`Arc<Selector>` memoization).
-- **Rich serializable errors**: `ScrapeError` variants carry url, status,
-  selector and attribute context; `#[non_exhaustive]`.
-
-### 💥 Breaking
-
-- Removed `RemoteScrapable`, `RemoteScraper`, `RemoteScraperBuilder`,
-  `remote_scrape`; replaced by `Extract`, `Scraper`, `ScraperBuilder` and
-  plain url iterators. See the migration table in the README.
-
-### 🚜 Refactor
-
-- Split the crate into `error`, `selector`, `page`, `extract` and `client`
-  modules behind a curated public API plus a `prelude`.
-
-### 🧪 Testing
-
-- Deterministic bounded-concurrency measurement in the hand-rolled test
-  server (handler-scoped activity window), new chunked-encoding and
-  charset test paths, 89 integration tests + 16 doctests, all offline.
-
 ## [Unreleased]
 
 ### ⛰️ Features
 
 - *(ci)* Add git-cliff changelog auto-generation workflow - ([32443e4](https://github.com/elcoosp/scrpr/commit/32443e47db7d7f55f435b035415ef07041e60b94))
 - *(ci)* Add comprehensive CI pipeline with fmt, clippy, tests, MSRV and coverage - ([69ad7b7](https://github.com/elcoosp/scrpr/commit/69ad7b7a4b30846bb91f16847425b29e60c2eca9))
+- *(client)* Implement polite concurrent scraper and page cache - ([ef4eeee](https://github.com/elcoosp/scrpr/commit/ef4eeee7a097b9aebccc93337f4d2b54fc09c906))
+- *(error)* Introduce rich context error enumerations - ([1c9e8a6](https://github.com/elcoosp/scrpr/commit/1c9e8a63971bfbde38d3b1e699fae7a7fc55643f))
+- *(extract)* Implement Extract trait and composable fields DSL - ([89e5396](https://github.com/elcoosp/scrpr/commit/89e5396153881ffb2878191fbe624774bd4180c8))
+- *(page)* Design parsed document Page handle with absolute resolution - ([1e67055](https://github.com/elcoosp/scrpr/commit/1e67055ecc24cdc20eab03771a8a4b8fe5112e95))
+- *(selector)* Create process-wide bounded CSS selector cache - ([b8e0813](https://github.com/elcoosp/scrpr/commit/b8e081336a9b77b67fe9ab4abadd0a5a40fc0b8e))
 - [**breaking**] Bump to v0.2.0 with edition 2024, MSRV 1.88 and dependency overhaul - ([65f9704](https://github.com/elcoosp/scrpr/commit/65f970444b082a3cdda9ac059a5a0afffc92440b))
 - Add typed RemoteScrapeError enum with serde and thiserror - ([9f74ee9](https://github.com/elcoosp/scrpr/commit/9f74ee9724bd5a02c97dbae8ada3519152ddd732))
 - [**breaking**] Rewrite lib.rs with module structure and offline doctests - ([24927dd](https://github.com/elcoosp/scrpr/commit/24927ddac8db919ef54f0283bb01d6eb6efe3214))
@@ -69,9 +28,13 @@ All notable changes to this project will be documented in this file.
 ### 🚜 Refactor
 
 - *(ci)* Replace release-plz with git-cliff release pipeline - ([9a14910](https://github.com/elcoosp/scrpr/commit/9a14910ac7e9964d9c9e296ab1c4851d72fad0fb))
+- Reorganize public facade mapping into modular subcomponents - ([fd7f917](https://github.com/elcoosp/scrpr/commit/fd7f9175bf89c491a0dfb1e492d4f0b74308ec93))
 
 ### 📚 Documentation
 
+- *(changelog)* Document breaking extraction redesign for v0.3.0 - ([2b8864e](https://github.com/elcoosp/scrpr/commit/2b8864e671227b42fe91ab62c41c81fc9f7e7ebc))
+- *(maintainer)* Document the v0.3.0 decoupled design rationale - ([2ba2d9a](https://github.com/elcoosp/scrpr/commit/2ba2d9ae4a23a2b1cdff87220bf8dbfeab35b44d))
+- *(readme)* Rewrite tour for typed declarative scraping - ([25479ee](https://github.com/elcoosp/scrpr/commit/25479ee2c2e3cfd3b008abb05d9b868bebd14952))
 - Crate link fix - ([f02e980](https://github.com/elcoosp/scrpr/commit/f02e980298bcb53d92b38cc05b60162563848df3))
 - Up readme - ([adaaf67](https://github.com/elcoosp/scrpr/commit/adaaf672fb4f9e74d84a4c1c6ddc32bd76e6e5b5))
 - Fix double unreleased in changelog - ([72c7078](https://github.com/elcoosp/scrpr/commit/72c707802091d2d01f261a906de6131f8f5f224f))
@@ -83,6 +46,8 @@ All notable changes to this project will be documented in this file.
 
 - Add comprehensive offline test suite with 25+ test cases - ([2f3f878](https://github.com/elcoosp/scrpr/commit/2f3f87890a311df3675d4d76686a56c5e10f886b))
 - Add hand-rolled HTTP test server with zero external dependencies - ([8b10338](https://github.com/elcoosp/scrpr/commit/8b10338c90a9dccb1c946349debdc66765c9b850))
+- Convert integration suites to evaluate unallocated pages - ([90bfbb3](https://github.com/elcoosp/scrpr/commit/90bfbb3d8030a2e124fa4db340632e9d428eda25))
+- Enhance hand-rolled test server with chunked responses - ([ff6bd7c](https://github.com/elcoosp/scrpr/commit/ff6bd7cbf300b51569b0d61583db7d86a5bd6606))
 
 ### ⚙️ Miscellaneous Tasks
 
@@ -93,6 +58,9 @@ All notable changes to this project will be documented in this file.
 - Up release-plz - ([7f9e759](https://github.com/elcoosp/scrpr/commit/7f9e759d3186832ef78e1195b1f7ebeb6eb97734))
 - Use actions-rust-lang/setup-rust-toolchain - ([26f0c9a](https://github.com/elcoosp/scrpr/commit/26f0c9abc5159e092136191125263bbdd5745417))
 - Readme - ([61f2c76](https://github.com/elcoosp/scrpr/commit/61f2c7636a6c5c66f26b52cea12624a19418eb38))
+- Update .DS_Store - ([90207d2](https://github.com/elcoosp/scrpr/commit/90207d2a977c8f778346c88b8fd5b32798e14f60))
+- Synchronize lockfile for async compression and cookie stores - ([a91f48c](https://github.com/elcoosp/scrpr/commit/a91f48c481d59e1214d30d82c92cb0140e7a7d56))
+- Bump package version to 0.3.0 and inject json feature - ([53745ae](https://github.com/elcoosp/scrpr/commit/53745ae6b01a087e987f9730edd5c4bb80d8f07a))
 
 
 ## [0.1.0]
