@@ -2,6 +2,52 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2026-11-03
+
+### ⛰️ Features (breaking redesign)
+
+- **Typed extraction**: new `Extract` trait (serde-style, one impl per domain
+  type) plus `scrape_html`, `Scraper::fetch_as`, `Scraper::scrape` and
+  `Scraper::scrape_stream` entry points.
+- **Composable field DSL**: `field::{text, text_all, attr, attr_opt, attr_all,
+  attr_url, inner_html, outer_html, links, page_url, title, meta,
+  meta_property, json_ld}` extractors with `map` / `try_map` / `parse::<F>` /
+  `optional` / `or` / `or_default` combinators and tuple extraction
+  (`FieldSet`, up to 12 fields, owned or borrowed).
+- **`Page` handle**: parsed document + source url with `select`,
+  `select_first`, `links`, `title`, `meta`, `meta_property`, `scripts`,
+  `json_ld` (behind the default `json` feature) and `resolve`.
+- **Streaming batch API**: `scrape_stream` yields `(position, result)` pairs
+  in input order with bounded concurrency.
+- **Politeness**: `rate_limit` / `min_request_interval` pacing, capped
+  exponential backoff, `Retry-After` honored on 429 (configurable),
+  identifying default `User-Agent`.
+- **Robustness**: response body size cap with capped streaming reads,
+  charset decoding via `encoding_rs`, connect/read timeouts, redirect
+  policy controls, cookie store, proxy support, default headers.
+- **Optional page cache**: capacity + TTL bounded, deduplicates repeated
+  urls, shared across `Scraper` clones.
+- **Process-wide CSS selector cache** (`Arc<Selector>` memoization).
+- **Rich serializable errors**: `ScrapeError` variants carry url, status,
+  selector and attribute context; `#[non_exhaustive]`.
+
+### 💥 Breaking
+
+- Removed `RemoteScrapable`, `RemoteScraper`, `RemoteScraperBuilder`,
+  `remote_scrape`; replaced by `Extract`, `Scraper`, `ScraperBuilder` and
+  plain url iterators. See the migration table in the README.
+
+### 🚜 Refactor
+
+- Split the crate into `error`, `selector`, `page`, `extract` and `client`
+  modules behind a curated public API plus a `prelude`.
+
+### 🧪 Testing
+
+- Deterministic bounded-concurrency measurement in the hand-rolled test
+  server (handler-scoped activity window), new chunked-encoding and
+  charset test paths, 89 integration tests + 16 doctests, all offline.
+
 ## [Unreleased]
 
 ### ⛰️ Features
