@@ -2,7 +2,9 @@
 //!
 //! It avoids any extra dependency: a `std::net::TcpListener` serves one
 //! thread per connection and delegates every request to the handler
-//! closure.
+//! closure. Concurrency is measured while the *handler* runs only, which
+//! makes the bounded-concurrency assertions deterministic (socket teardown
+//! no longer counts as activity).
 
 use std::collections::HashMap;
 use std::io::{Read, Write};
@@ -25,55 +27,110 @@ pub struct TestRequest {
 #[derive(Debug, Clone)]
 pub struct TestResponse {
     status: u16,
-    body: String,
+    body: Vec<u8>,
+    content_type: String,
+    extra_headers: Vec<(String, String)>,
     content_length_override: Option<usize>,
+    chunked: bool,
 }
 
 impl TestResponse {
     /// HTTP 200 response with the given body.
     pub fn ok(body: impl Into<String>) -> Self {
-        Self {
-            status: 200,
-            body: body.into(),
-            content_length_override: None,
-        }
+        Self::status(200, body)
     }
 
     /// Response with a custom status code and body.
     pub fn status(status: u16, body: impl Into<String>) -> Self {
         Self {
             status,
-            body: body.into(),
+            body: body.into().into_bytes(),
+            content_type: "text/html".to_owned(),
+            extra_headers: Vec::new(),
             content_length_override: None,
+            chunked: false,
         }
+    }
+
+    /// Raw bytes body (for charset tests).
+    pub fn bytes(status: u16, content_type: &str, body: Vec<u8>) -> Self {
+        let mut response = Self::status(status, "");
+        response.body = body;
+        response.content_type = content_type.to_owned();
+        response
+    }
+
+    /// Response with a custom `Content-Type` header.
+    pub fn with_content_type(mut self, content_type: &str) -> Self {
+        self.content_type = content_type.to_owned();
+        self
+    }
+
+    /// Adds a response header.
+    pub fn with_header(mut self, name: &str, value: &str) -> Self {
+        self.extra_headers.push((name.to_owned(), value.to_owned()));
+        self
+    }
+
+    /// HTTP redirect (302) with a `Location` header.
+    pub fn redirect(location: &str) -> Self {
+        Self::status(302, "")
+            .with_header("Location", location)
+            .with_content_type("text/html")
+    }
+
+    /// HTTP 429 with a `Retry-After` header (seconds form).
+    pub fn retry_after(seconds: u64) -> Self {
+        Self::status(429, "slow down").with_header("Retry-After", &seconds.to_string())
     }
 
     /// Lies about the `Content-Length` (larger than the real body) so the
     /// client body read fails mid-flight.
     pub fn truncated_body(body: impl Into<String>) -> Self {
         let body = body.into();
-        Self {
-            status: 200,
-            content_length_override: Some(body.len() + 50),
-            body,
-        }
+        let mut response = Self::ok(body.clone());
+        response.content_length_override = Some(body.len() + 50);
+        response
+    }
+
+    /// Sends the body with `Transfer-Encoding: chunked`, two bytes per
+    /// chunk, forcing the client through many small reads.
+    pub fn chunked(body: impl Into<String>) -> Self {
+        let mut response = Self::ok(body);
+        response.chunked = true;
+        response
     }
 
     fn write_to(&self, stream: &mut TcpStream) -> std::io::Result<()> {
-        let head = if let Some(length) = self.content_length_override {
-            format!(
-                "HTTP/1.1 {} X\r\nContent-Type: text/html\r\nContent-Length: {length}\r\nConnection: close\r\n\r\n",
-                self.status
-            )
+        let mut extra = String::new();
+        for (name, value) in &self.extra_headers {
+            extra.push_str(name);
+            extra.push_str(": ");
+            extra.push_str(value);
+            extra.push_str("\r\n");
+        }
+        if self.chunked {
+            extra.push_str("Transfer-Encoding: chunked\r\n");
+            let head = format!(
+                "HTTP/1.1 {} X\r\nContent-Type: {}\r\n{extra}Connection: close\r\n\r\n",
+                self.status, self.content_type
+            );
+            stream.write_all(head.as_bytes())?;
+            for pair in self.body.chunks(2) {
+                write!(stream, "{:x}\r\n", pair.len())?;
+                stream.write_all(pair)?;
+                stream.write_all(b"\r\n")?;
+            }
+            stream.write_all(b"0\r\n\r\n")?;
         } else {
-            format!(
-                "HTTP/1.1 {} X\r\nContent-Type: text/html\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
-                self.status,
-                self.body.len()
-            )
-        };
-        stream.write_all(head.as_bytes())?;
-        stream.write_all(self.body.as_bytes())?;
+            let length = self.content_length_override.unwrap_or(self.body.len());
+            let head = format!(
+                "HTTP/1.1 {} X\r\nContent-Type: {}\r\n{extra}Content-Length: {length}\r\nConnection: close\r\n\r\n",
+                self.status, self.content_type
+            );
+            stream.write_all(head.as_bytes())?;
+            stream.write_all(&self.body)?;
+        }
         stream.flush()
     }
 }
@@ -116,22 +173,27 @@ impl TestServer {
                 let seen_headers = Arc::clone(&seen_headers);
                 thread::spawn(move || {
                     hit_count.fetch_add(1, Ordering::SeqCst);
-                    let active = active_count.fetch_add(1, Ordering::SeqCst) + 1;
-                    concurrent_max.fetch_max(active, Ordering::SeqCst);
                     let request = read_request(&stream);
                     if let Some(request) = request {
-                        for (name, value) in &request.headers {
-                            seen_headers
+                        {
+                            let mut headers = seen_headers
                                 .lock()
-                                .expect("headers lock")
-                                .entry(name.clone())
-                                .or_insert_with(|| value.clone());
+                                .unwrap_or_else(std::sync::PoisonError::into_inner);
+                            for (name, value) in &request.headers {
+                                headers.entry(name.clone()).or_insert_with(|| value.clone());
+                            }
                         }
+                        // Concurrency is measured around the handler only:
+                        // the response is written *after* the decrement, so
+                        // the client cannot observe a response while a
+                        // previous request still counts as active.
+                        let active = active_count.fetch_add(1, Ordering::SeqCst) + 1;
+                        concurrent_max.fetch_max(active, Ordering::SeqCst);
                         let response = handler(&request);
+                        active_count.fetch_sub(1, Ordering::SeqCst);
                         let _ = response.write_to(&mut stream);
                     }
                     let _ = stream.shutdown(std::net::Shutdown::Both);
-                    active_count.fetch_sub(1, Ordering::SeqCst);
                 });
             }
         });
@@ -149,7 +211,7 @@ impl TestServer {
         self.hit_count.load(Ordering::SeqCst)
     }
 
-    /// Highest number of requests handled at the same time.
+    /// Highest number of handlers running at the same time.
     pub fn concurrent_max(&self) -> usize {
         self.concurrent_max.load(Ordering::SeqCst)
     }
@@ -158,7 +220,7 @@ impl TestServer {
     pub fn seen_header(&self, name: &str) -> Option<String> {
         self.seen_headers
             .lock()
-            .expect("headers lock")
+            .unwrap_or_else(std::sync::PoisonError::into_inner)
             .get(&name.to_ascii_lowercase())
             .cloned()
     }
