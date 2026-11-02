@@ -1,92 +1,136 @@
-//! `scrpr` is a tiny, composable scraping toolkit.
+//! `scrpr` is a tiny, composable scraping toolkit: **typed extraction for
+//! HTML pages, with a polite HTTP client attached**.
 //!
-//! Implement [`RemoteScrapable`] to describe *where* a resource lives (its
-//! id-based URL), *which* elements to select (a CSS selector) and *how* to
-//! convert them into your own output type. The crate then takes care of
-//! fetching pages concurrently with retries and timeouts, or parsing local
-//! HTML you already have.
+//! Describe *how to pull fields out of a page* with the [`field`] DSL or the
+//! [`Extract`] trait (serde-style: one impl per domain type), and the crate
+//! takes care of fetching pages concurrently — with retries, timeouts, rate
+//! limiting, an optional TTL cache and bounded concurrency — or parsing HTML
+//! you already have.
 //!
-//! # Offline example
+//! # Offline extraction
 //!
 //! ```
-//! use scrpr::{ElementExt, RemoteScrapable, RemoteScrapeError, scrape_html};
+//! use scrpr::{field, Page};
 //!
-//! struct AppIcon;
-//!
-//! impl RemoteScrapable for AppIcon {
-//!     type Output = String;
-//!
-//!     fn id_url(&self, id: &str) -> String {
-//!         format!("https://store.example.com/app/{id}")
-//!     }
-//!
-//!     fn elem_into(
-//!         &self,
-//!         elem: scraper::ElementRef<'_>,
-//!     ) -> Result<Self::Output, RemoteScrapeError> {
-//!         elem.required_attr("src").map(ToOwned::to_owned)
-//!     }
-//!
-//!     fn res_selector(&self) -> &str {
-//!         "img.icon"
-//!     }
-//! }
-//!
-//! let html = r#"<html><body><img class="icon" src="/icon.png"></body></html>"#;
-//! let icon = scrape_html(&AppIcon, html).expect("icon present");
+//! let page = Page::parse(r#"<html><body><img class="icon" src="/icon.png"></body></html>"#);
+//! let icon = field::attr("img.icon", "src").get(&page).unwrap();
 //! assert_eq!(icon, "/icon.png");
 //! ```
 //!
-//! # Remote example
+//! # Typed extraction into your own structs
 //!
 //! ```
-//! use scrpr::{ElementExt, RemoteScraper, RemoteScrapable, RemoteScrapeError};
+//! use scrpr::{field, Extract, Page, ScrapeError};
 //!
-//! struct Title;
+//! struct Product {
+//!     title: String,
+//!     price: f64,
+//! }
 //!
-//! impl RemoteScrapable for Title {
-//!     type Output = String;
-//!
-//!     fn id_url(&self, id: &str) -> String {
-//!         format!("https://example.com/{id}")
-//!     }
-//!
-//!     fn elem_into(
-//!         &self,
-//!         elem: scraper::ElementRef<'_>,
-//!     ) -> Result<Self::Output, RemoteScrapeError> {
-//!         Ok(elem.text_content())
-//!     }
-//!
-//!     fn res_selector(&self) -> &str {
-//!         "h1"
+//! impl Extract for Product {
+//!     fn extract(page: &Page) -> Result<Self, ScrapeError> {
+//!         let (title, price) = scrpr::extract(
+//!             page,
+//!             (
+//!                 field::text("h1.name"),
+//!                 field::text("span.price").parse::<f64>(),
+//!             ),
+//!         )?;
+//!         Ok(Self { title, price })
 //!     }
 //! }
 //!
-//! # async fn demo() -> Result<(), RemoteScrapeError> {
-//! let scraper = RemoteScraper::builder()
-//!     .user_agent("scrpr-example/0.2")
-//!     .max_retries(1)
+//! let html = r#"<h1 class="name">Chair</h1><span class="price">49.90</span>"#;
+//! let product = scrpr::scrape_html::<Product>(html).unwrap();
+//! assert_eq!(product.title, "Chair");
+//! assert!((product.price - 49.9).abs() < 1e-9);
+//! ```
+//!
+//! # Remote fetching
+//!
+//! ```
+//! # use std::time::Duration;
+//! use scrpr::{Scraper, ScrapeError, field};
+//!
+//! # async fn demo() -> Result<(), ScrapeError> {
+//! let scraper = Scraper::builder()
+//!     .user_agent("my-bot/0.1")
+//!     .timeout(Duration::from_secs(10))
+//!     .concurrency(8)
+//!     .max_retries(2)
+//!     .rate_limit(10)          // politeness: max 10 requests/second
+//!     .cache_capacity(256)     // dev-friendliness: re-runs hit the cache
 //!     .build()?;
 //!
-//! // One result per id, always in the input order.
-//! let titles = scraper.scrape(&Title, ["a", "b", "c"]).await;
+//! let page = scraper.fetch("https://example.net/catalog").await?;
+//! let links = field::links().get(&page)?;
 //! # Ok(())
+//! # }
+//! ```
+//!
+//! # Batch and streaming
+//!
+//! ```
+//! use scrpr::{Extract, Page, ScrapeError, Scraper, field};
+//!
+//! struct Title(String);
+//!
+//! impl Extract for Title {
+//!     fn extract(page: &Page) -> Result<Self, ScrapeError> {
+//!         Ok(Self(field::text("h1").get(page)?))
+//!     }
+//! }
+//!
+//! # async fn demo() {
+//! let scraper = Scraper::new().unwrap();
+//! let urls = (1..=100).map(|i| format!("https://example.net/page/{i}"));
+//!
+//! // Collect everything: Vec<Result<Title>, _> in input order.
+//! let titles = scraper.scrape::<Title, _, _>(urls).await;
+//!
+//! // ...or consume as they complete: Stream<Item = (usize, Result<Title>)>.
+//! # let urls = (1..=100).map(|i| format!("https://example.net/page/{i}"));
+//! let mut stream = scraper.scrape_stream::<Title, _, _>(urls);
+//! // while let Some((position, result)) = stream.next().await { ... }
 //! # }
 //! ```
 
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 #![doc(html_root_url = "https://docs.rs/scrpr")]
 
+mod client;
 mod error;
-mod scraper;
+mod extract;
+mod page;
+mod selector;
 #[cfg(test)]
 mod tests;
-mod traits;
 
-pub use crate::error::RemoteScrapeError;
-pub use crate::scraper::{
-    DEFAULT_CONCURRENCY, DEFAULT_MAX_RETRIES, DEFAULT_RETRY_DELAY, DEFAULT_TIMEOUT, RemoteScraper,
-    RemoteScraperBuilder, remote_scrape, scrape_html, scrape_html_all,
+pub use crate::client::{
+    DEFAULT_CACHE_TTL, DEFAULT_CONCURRENCY, DEFAULT_MAX_BODY_SIZE, DEFAULT_MAX_RETRIES,
+    DEFAULT_MAX_RETRY_DELAY, DEFAULT_RETRY_DELAY, DEFAULT_TIMEOUT, DEFAULT_USER_AGENT,
+    ScrapeStream, Scraper, ScraperBuilder, fetch, fetch_as,
 };
-pub use crate::traits::{ElementExt, RemoteScrapable};
+pub use crate::error::ScrapeError;
+pub use crate::extract::{
+    Extract, Extractor, FieldSet, extract, extract_from, field, scrape_html, scrape_html_with,
+};
+pub use crate::page::{ElementExt, Page};
+pub use scraper::{ElementRef, Html, Selector};
+
+/// One-stop import for the everyday API.
+///
+/// ```
+/// use scrpr::prelude::*;
+///
+/// let page = Page::parse(r#"<h1>Hi</h1>"#);
+/// assert_eq!(field::text("h1").get(&page).unwrap(), "Hi");
+/// ```
+pub mod prelude {
+    pub use crate::client::{Scraper, ScraperBuilder};
+    pub use crate::error::ScrapeError;
+    pub use crate::extract::{
+        Extract, Extractor, FieldSet, extract, extract_from, field, scrape_html, scrape_html_with,
+    };
+    pub use crate::page::{ElementExt, Page};
+}
