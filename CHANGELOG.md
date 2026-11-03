@@ -61,6 +61,7 @@ All notable changes to this project will be documented in this file.
 - Update .DS_Store - ([90207d2](https://github.com/elcoosp/scrpr/commit/90207d2a977c8f778346c88b8fd5b32798e14f60))
 - Synchronize lockfile for async compression and cookie stores - ([a91f48c](https://github.com/elcoosp/scrpr/commit/a91f48c481d59e1214d30d82c92cb0140e7a7d56))
 - Bump package version to 0.3.0 and inject json feature - ([53745ae](https://github.com/elcoosp/scrpr/commit/53745ae6b01a087e987f9730edd5c4bb80d8f07a))
+- Up deps - ([260e683](https://github.com/elcoosp/scrpr/commit/260e6834b65f2aceedfc18b6135a5acd75da1028))
 
 
 ## [0.1.0]
