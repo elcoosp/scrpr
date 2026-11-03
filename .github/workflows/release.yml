@@ -19,8 +19,8 @@ jobs:
 <<<<<<< HEAD
       - uses: actions-rust-lang/setup-rust-toolchain@v2
 ||||||| parent of 2ee984b (refactor(ci): replace release-plz with git-cliff release pipeline)
-      - uses: actions/checkout@v6
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: actions/checkout@v7
+      - uses: actions-rust-lang/setup-rust-toolchain@v2
 =======
 >>>>>>> 2ee984b (refactor(ci): replace release-plz with git-cliff release pipeline)
         with:
@@ -32,7 +32,7 @@ jobs:
       - name: test
         run: cargo test
       - name: release-plz
-        uses: release-plz/action@v0.5.140
+        uses: release-plz/action@v0.5.148
 ||||||| parent of 2ee984b (refactor(ci): replace release-plz with git-cliff release pipeline)
           toolchain: nightly
           override: true
@@ -41,7 +41,7 @@ jobs:
       - name: test
         run: cargo test
       - name: release-plz
-        uses: release-plz/action@v0.5.120
+        uses: release-plz/action@v0.5.148
 =======
           # git-cliff needs the full history and every tag.
           fetch-depth: 0
@@ -70,6 +70,6 @@ jobs:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           body_path: release-notes.md

@@ -27,10 +27,10 @@ serde = { version = "1.0.229", features = ["derive"] }
 tokio = { version = "1.54.1", features = ["macros", "time", "sync"] }
 tracing = { version = "0.1.44", default-features = false, features = ["std"] }
 encoding_rs = "0.8.44"
-serde_json = { version = "1.0.145", optional = true }
+serde_json = { version = "1.0.154", optional = true }
 
 [dev-dependencies]
-serde_json = "1.0.145"
+serde_json = "1.0.154"
 tokio = { version = "1.54.1", features = ["rt-multi-thread"] }
 
 [lints.rust]
